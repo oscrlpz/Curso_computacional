@@ -70,7 +70,7 @@ end
 
 
 function /(x::Intervalo, y::Intervalo)
-    if y.a<=0 && y.b>=0
+    if y.a<0 && y.b>0
         println("El intervalo contiene al cero.")
     else
     
@@ -142,6 +142,15 @@ end
 function *(x::Real,y::Intervalo)
     Intervalo(x)*y
 end
+
+function /(x::Intervalo,y::Real)
+    x/Intervalo(y)
+end
+
+function /(x::Real,y::Intervalo)
+    Intervalo(x)/y
+end
+
 
 function monot(x::Intervalo, f::Function)
     if f(x.a)<f(x.b)
