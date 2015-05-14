@@ -1,6 +1,7 @@
 module Intervalos
 export Intervalo, round_down, round_up
 
+
 function round_down()
     set_rounding(BigFloat, RoundDown)
 end
@@ -151,6 +152,11 @@ function /(x::Real,y::Intervalo)
     Intervalo(x)/y
 end
 
+import Base.abs
+
+function abs(x::Intervalo)
+    Intervalo(abs(x.a), abs(x.b))
+end
 
 function monot(x::Intervalo, f::Function)
     if f(x.a)<f(x.b)
@@ -159,6 +165,32 @@ function monot(x::Intervalo, f::Function)
         Intervalo(f(x.b),f(x.a))
     end
 end   
+
+function Base.show(io::IO, t::Intervalo)
+    intval="($(t.a), $(t.b))"
+    print(io,intval)
+end
+
+import Base.ones
+import Base.zeros
+function ones(::Type{Intervalo}, n::Integer)
+    one=Intervalo[]
+    for i=1:n
+        one=push!(one,Intervalo(1))
+    end
+    one
+end
+
+function zeros(::Type{Intervalo}, n::Integer)
+    zero=Intervalo[]
+    for i=1:n
+        zero=push!(zero,Intervalo(0))
+    end
+    zero
+end
+
+Base.zero(::Type{Intervalo}) = Intervalo(0)
+Base.zero(::Type{Any}) = 0
 
 end
 
