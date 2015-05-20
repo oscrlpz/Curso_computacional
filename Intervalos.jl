@@ -1,7 +1,7 @@
 module Intervalos
-export Intervalo, round_down, round_up
+export Intervalo, round_down, round_up, diametro, big_pi
 
-
+#########################
 function round_down()
     set_rounding(BigFloat, RoundDown)
 end
@@ -11,12 +11,20 @@ function round_up()
 end
 
 type Intervalo
-    a::Real
-    b::Real
+    a::Number
+    b::Number
 
 # Para que redondee bien los BigFloat necesito agarrar una cadena binaria 
 # y hacer que Julia la convierta a BigFloat con el redondeo requerido.
-   function Intervalo(a,b)
+function Intervalo(x,y)
+        if x>y
+            a=y
+            b=x
+        else
+            a=x
+            b=y
+        end
+			
         round_down()
         c=BigFloat("$a")
         round_up()
@@ -24,11 +32,44 @@ type Intervalo
 
         new(c,d)
     end
+
+#### Para constantes matematicas
+
+function Intervalo(y::MathConst,x::MathConst)
+    b=big(x)
+    a=big(y)
+    Intervalo(a,b)
+end
+
+function Intervalo(x::MathConst,y)
+    c=big(x)
+    Intervalo(big(c),y)
+end
+
+function Intervalo(y,x::MathConst)
+    c=big(x)
+    Intervalo(y,big(c))
+end
+
+function Intervalo(x::MathConst)
+    c=big(x)
+    Intervalo(big(c))
+end
+#################
+
+function Intervalo(x::Real)
+    Intervalo(x,x)
 end
 
 
+end
+#########################
+
+##################
+### ARITMETICA ###
+##################
+
 function +(x::Intervalo, y::Intervalo)
-    
     round_down()
     ra=x.a+y.a
     
@@ -38,7 +79,6 @@ function +(x::Intervalo, y::Intervalo)
     r=Intervalo(ra, rb)
   
     r
-    
 end
 
 
@@ -87,9 +127,6 @@ function /(x::Intervalo, y::Intervalo)
     end     
 end
 
-function Intervalo(x::Real)
-    Intervalo(x,x)
-end
 
 function ^(x::Intervalo, n::Integer)
     if mod(n,2)!=0
@@ -191,6 +228,10 @@ end
 
 Base.zero(::Type{Intervalo}) = Intervalo(0)
 Base.zero(::Type{Any}) = 0
+
+function diametro(x::Intervalo)
+    abs(x.b-x.a)
+end
 
 end
 
