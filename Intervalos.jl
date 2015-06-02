@@ -233,5 +233,54 @@ function diametro(x::Intervalo)
     abs(x.b-x.a)
 end
 
+############## SIN/COS ######
+
+function pi_n(x::Intervalo)
+    pimenos=floor(x.a*2/pi)
+    pimas=ceil(x.b*2/pi)
+    Intervalo(pimenos, pimas)
+end
+
+import Base.sin
+
+function sin(x::Intervalo)
+    sin_a=sign(x.a)*sin(abs(x.a)) ##### sirve o no?
+    sin_b=sign(x.b)*sin(abs(x.b))
+    n=pi_n(x)
+    k=(n-1)/2
+    
+    if diametro(n)>=4
+        Intervalo(-1,1)
+     
+    elseif diametro(n)==3
+        if (mod(n.a,2)!=0 && mod(n.a,2)!=0) || (mod(n.b,2)!=0 && mod(n.b,2)!=0)
+            Intervalo(-1, max(sin_a,sin_b))
+        else
+            Intervalo(min(sin_a,sin_b),1)
+        end   
+        
+    elseif diametro(n)==2
+        
+        if mod(n.a,2)!=0 #&& mod(k.a,2)!=0
+            ##decreciente o creciente##\
+            Intervalo(sin_a, sin_b)
+        elseif mod(n.a,2)==0 && mod(((n.a-1)/2),2)==0
+            Intervalo(-1, max(sin_a,sin_b))
+        else
+            Intervalo(min(sin_a,sin_b),1)
+        end
+        
+    elseif diametro(n)<=1
+        Intervalo(sin_a, sin_b)
+    end
+    
+end
+
+import Base.cos
+function cos(x::Intervalo)
+    x2=x+big(pi)/2
+    sin(x2)
+end
+
 end
 
