@@ -71,5 +71,4 @@ function ^(x::FD,a::FloatingPoint)
     FD(x.f^a,a*x.f^(a-1)*x.d)
 end
 
-
 end

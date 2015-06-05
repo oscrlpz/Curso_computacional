@@ -130,13 +130,26 @@ end
 
 function ^(x::Intervalo, n::Integer)
     if mod(n,2)!=0
-        r=Intervalo(x.a^n, x.b^n)
+ 	    round_down()
+            ra=x.a^n
+            round_up()
+            rb=x.b^n
+            r=Intervalo(ra, rb)
     else
         if x.a>=0
-            r=Intervalo(x.a^n, x.b^n)
+            round_down()
+            ra=x.a^n
+            round_up()
+            rb=x.b^n
+            r=Intervalo(ra, rb)
         elseif x.b<0
-            r=Intervalo(x.b^n, x.a^n)
+            round_up()
+            ra=x.a^n
+            round_down()
+            rb=x.b^n
+            r=Intervalo(rb, ra)
         else
+	    round_up()
             r=Intervalo(0, max(x.a^n, x.b^n))
         end
     end
@@ -151,7 +164,11 @@ function ^(x::Intervalo, a::FloatingPoint)
         if x.a<0 || x.b<0
             throw(DomainError())
         else
-            r=Intervalo(x.a^a, x.b^a)#ya que x^a es monótonamente creciente
+            round_down()
+            ra=x.a^a
+            round_up()
+            rb=x.b^a
+            r=Intervalo(ra, rb)#ya que x^a es monótonamente creciente
         end
     end
     r
@@ -280,6 +297,49 @@ import Base.cos
 function cos(x::Intervalo)
     x2=x+big(pi)/2
     sin(x2)
+end
+#####################
+#################
+######################
+
+
+export IC, +,-,*,/,^,conjg, norm, expi
+
+type IC
+R
+I
+end
+
+
+
++(a::IC, b::IC)=IC(a.R+b.R, a.I+b.I)
+
+
+-(a::IC, b::IC)=IC(a.R-b.R, a.I-b.I)
+
+
+*(a::IC, b::IC)=IC(a.R*b.R-a.I*b.I, a.I*b.R+a.R*b.I)
+
+
+conjg(a::IC)=IC(a.R, a.I*-1)
+
+norm(a::IC)=(a.R^2+a.I^2)^(1/2)
+
+#la exponencial imaginaria
+
+expi(t)=IC(cos(t), sin(t))
+
+/(z::IC,d)=IC(z.R/d,z.I /d)
+
+
+function  /(a::IC, b::IC)
+a*conjg(b)/norm(b)
+end
+
+#### operacione entre intervalos y complejos #####
+
+function *(I::Intervalo, c::Complex)
+    IC(I*real(c), I*imag(c))
 end
 
 end
